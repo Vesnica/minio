@@ -303,8 +303,8 @@ func (adm *AdminClient) ListObjectsHeal(bucket, prefix string, recursive bool, d
 		// Save marker for next request.
 		var marker string
 		for {
-			// Get list of objects a maximum of 1000 per request.
-			result, err := adm.listObjectsHeal(bucket, prefix, marker, delimiter, 1000)
+			// Get list of objects a maximum of 100 per request.
+			result, err := adm.listObjectsHeal(bucket, prefix, marker, delimiter, 100)
 			if err != nil {
 				objectStatCh <- ObjectInfo{
 					Err: err,
