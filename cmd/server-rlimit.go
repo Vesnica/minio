@@ -17,6 +17,8 @@
 package cmd
 
 import (
+	"os"
+	"strconv"
 	"runtime/debug"
 
 	"github.com/minio/minio/pkg/sys"
