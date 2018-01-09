@@ -59,15 +59,34 @@ func getMaxCacheSize(curLimit, totalRAM uint64) (cacheSize uint64) {
 	if curLimit < minRAMSize || totalRAM < minRAMSize {
 		return cacheSize
 	}
-
-	// Return 50% of current rlimit or total RAM as cache size.
-	if curLimit < totalRAM {
-		cacheSize = curLimit / 2
-	} else {
-		cacheSize = totalRAM / 2
-	}
-
-	return cacheSize
+	
+	// default return 15% of current rlimit or total RAM as cache size.
+        cachePer := os.Getenv("MINIO_CACHE_PERCENT")
+        i, err := strconv.ParseUint(cachePer, 10, 64)
+        if err != nil {
+                i = 15
+        }
+        if i < 1 || i > 80 {
+                i = 15
+        }
+        // default return 1073741824 as cache size max.
+        cacheM := os.Getenv("MINIO_CACHE_MAX")
+        cacheMax, err := strconv.ParseUint(cacheM, 10, 64)
+        if err != nil {
+                cacheMax = 1073741824
+        }
+	if cacheMax > curLimit {
+                cacheMax = curLimit
+        }
+        if curLimit < totalRAM {
+                cacheSize = curLimit * i / 100
+        } else {
+                cacheSize = totalRAM * i / 100
+        }
+        if cacheSize > cacheMax {
+                cacheSize = cacheMax
+        }
+        return cacheSize
 }
 
 // GetMaxCacheSize returns maximum cache size based on current RAM size and memory limit.
